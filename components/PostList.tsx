@@ -1,6 +1,6 @@
 "use client";
 
-import { fetchPosts } from "@/store/slices/postsSlice";
+import { fetchPosts, likePost } from "@/store/slices/postsSlice";
 import { AppDispatch, RootState } from "@/store/store";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,6 +24,12 @@ const PostList = () => {
     }
   }, [status, dispatch]);
 
+  //handle like button
+  const handleLikeAction = (postId: number) => {
+    //Dispatch action postLiked with payload is ID of the post
+    dispatch(likePost(postId));
+  };
+
   // 4. DISPLAY THE UI BASED ON STATE
   if (status === "loading") {
     return <p className="text-center mt-8 text-l">Loading...</p>;
@@ -46,6 +52,16 @@ const PostList = () => {
             {post.title}
           </h3>
           <p className="text-zinc-600">{post.body}</p>
+
+        
+          <div className="mt-4">
+            <button
+              onClick={() => handleLikeAction(post.id)}
+              className="px-4 py-1 text-sm font-medium text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+            >
+              👍 Like ({post.likes})
+            </button>
+          </div>
         </li>
       ))}
     </ul>

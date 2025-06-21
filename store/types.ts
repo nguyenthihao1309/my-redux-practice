@@ -1,10 +1,11 @@
-//1. định nghĩa kiểu dữ liệu
+//1. define data type
 //Post
 export interface Post {
   userId: number;
   id: number;
   title: string;
   body: string;
+  likes: number;
 }
 
 type PostState = "idle" | "loading" | "succeeded" | "failed";

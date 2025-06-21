@@ -12,19 +12,38 @@ const initialState: PostsState = {
 //createAsyncThunk makes handling asynchronous actions (like API calls) easy.
 // It will automatically create actions: pending, fulfilled, rejected.
 export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
-  const response = await fetch("https://jsonplaceholder.typicode.com/posts");
+  const response = await fetch("/api/posts");
   if (!response.ok) {
     throw new Error("Server responded with an error!");
   }
   const data: Post[] = await response.json();
+
   return data;
 });
+
+export const likePost = createAsyncThunk(
+  "posts/likePost",
+  async (postId: number) => {
+    const response = await fetch(`/api/posts/${postId}/like`, {
+      method: "PATCH",
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to like the post");
+    }
+
+    const updatedPost: Post = await response.json();
+    return updatedPost;
+  }
+);
 
 //3. create slices
 const postsSlice = createSlice({
   name: "posts", //name of slice
   initialState, // initial state
-  reducers: {}, //Reducers for synchronous actions (we don't have them here)
+  reducers: {
+    //Reducers for synchronous actions (we don't have them here)
+  },
 
   // extraReducers handle actions created from outside the slice,
   // here are the actions from createAsyncThunk.
@@ -44,9 +63,22 @@ const postsSlice = createSlice({
         // when api call fails: status is 'failed' and save error message
         state.status = EPostState.failed;
         state.error = action.error.message || "Something went wrong";
+      })
+      .addCase(likePost.fulfilled, (state, action: PayloadAction<Post>) => {
+        const updatedPost = action.payload;
+        // Find the index of the post to update in the state.posts array
+        const existingPostIndex = state.posts.findIndex(
+          (post) => post.id === updatedPost.id
+        );
+
+        if (existingPostIndex !== -1) {
+          // Replace old posts with new posts updated from the server
+          state.posts[existingPostIndex] = updatedPost;
+        }
       });
   },
 });
 
 //4. Export reducer
+
 export default postsSlice.reducer;
