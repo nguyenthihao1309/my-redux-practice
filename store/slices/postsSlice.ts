@@ -21,6 +21,27 @@ export const fetchPosts = createAsyncThunk("posts/fetchPosts", async () => {
   return data;
 });
 
+export const addNewPost = createAsyncThunk(
+  "posts/addNewPost",
+  async (initialPost: { title: string; body: string }) => {
+    const response = await fetch("/api/posts", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(initialPost),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create the post");
+    }
+
+    const newPost: Post = await response.json();
+    return newPost;
+  }
+);
+
+//Thunk for like
 export const likePost = createAsyncThunk(
   "posts/likePost",
   async (postId: number) => {
@@ -75,6 +96,11 @@ const postsSlice = createSlice({
           // Replace old posts with new posts updated from the server
           state.posts[existingPostIndex] = updatedPost;
         }
+      })
+      .addCase(addNewPost.fulfilled, (state, action: PayloadAction<Post>) => {
+        // Add new posts to the beginning of the state.posts array
+        // This helps new posts always appear at the top
+        state.posts.unshift(action.payload);
       });
   },
 });

@@ -18,3 +18,29 @@ export async function GET() {
     return new NextResponse("Error fetching posts", { status: 500 });
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    // Get title and body data from the request's body
+    const { title, body } = await request.json();
+
+    // Check simple input data
+    if (!title || !body) {
+      return new NextResponse("Title and body are required", { status: 400 });
+    }
+
+    // Use Prisma to create a new article in the database
+    const newPost = await prisma.post.create({
+      data: {
+        title,
+        body,
+        // 'likes' will have a default value of 0 as defined in the schema
+      },
+    });
+
+    return NextResponse.json(newPost, { status: 201 });
+  } catch (error) {
+    console.error("Request error", error);
+    return new NextResponse("Error creating post", { status: 500 });
+  }
+}

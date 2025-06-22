@@ -1,17 +1,17 @@
+import AddPostForm from "@/components/AddPostForm";
 import Header from "@/components/Header";
 import PostList from "@/components/PostList";
 import type { NextPage } from "next";
 
 const HomePage: NextPage = () => {
   return (
-    <div>
+    <div className="bg-zinc-50 min-h-screen">
       <Header />
 
-      {/* The main section contains the main content of the page */}
-      <main style={{ padding: "2rem" }}>
-        <h1>List of articles from API</h1>
+      <main className="container mx-auto p-4 md:p-8">
+        <AddPostForm />
 
-        {/* Put Client Component here */}
+        <h1 className="text-3xl font-bold mb-6 text-zinc-800">All Posts</h1>
         <PostList />
       </main>
     </div>
